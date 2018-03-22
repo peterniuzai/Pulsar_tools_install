@@ -1,0 +1,392 @@
+\documentclass{article}  
+\usepackage{graphicx}
+\usepackage{enumerate}
+\usepackage{url}
+\usepackage[colorlinks,linkcolor=blue]{hyperref}
+\usepackage{amsmath}  
+\begin{document}
+\title{Radio Transients Software Install Instruction}
+\author{Chenhui Niu}
+\maketitle
+\section*{Software in this Document}
+After go through a lot of trials and errors, I find a way that could install the following 2 common Pulsar software both on \textbf{Linux OS} and \textbf{MacOS}.  
+\begin{itemize}
+\item[-] SIGPROC/SIGPYPROC
+\item[-] PRESTO
+\end{itemize}
+Exclude the official instructions on main page of software, I was following two useful memo:
+\begin{itemize}
+\item[*] \url{https://docs.google.com/document/d/1v8Dm4f-SOeDQX5Yli6syek1pxtqgpw81b1cxqoqv2aU/edit#}
+
+\item[*] \url{http://www.ljtwebdevelopment.com/pulsarref/pulsar-software-install-mac-lion.html}
+\end{itemize}
+
+Which are telling us how to install PRESTO on Unbuntu and Pulsar software Suite on Mac separately.
+In this Memo,  I quote instructions from above 2 websites in order to make a summary. 
+
+For Fast Radio Transient (FRB) search software, Vishal G. has a Sigproc Giant Pulse Search code which is modified from Sigproc source code. But Here I mainly introduce Heimdall which are running on GPU server. 
+
+\section*{Software Install On MacOS}
+\section{Preparation for MacOS}
+This is got from:\\
+
+ \url{http://www.ljtwebdevelopment.com/pulsarref/pulsar-software-install-mac-lion.html}
+
+\subsection{Xcode and Homebrew}
+Install the latest version of XCode and XCode command line tools from the App store. We use $brew$ to install some software from repository. Follow the install instructions on \url{http://mxcl.github.io/homebrew/}. Homebrew is installed to /usr/local by default.  
+\subsection{Install dependencies by brew}
+\begin{itemize}
+\item[$\$$] brew doctor
+\item[$\$$] brew install gfortran
+\item[$\$$] brew install glib
+\item[$\$$] brew install cfitsio
+\item[$\$$] brew install pgplot
+\item[$\$$] brew install autoconf
+\item[$\$$] brew install automake
+\item[$\$$] brew install libtool
+\item[$\$$] brew install swig
+\item[$\$$] brew install cvs
+\item[$\$$] brew install python
+\item[$\$$] pip install numpy
+\end{itemize}
+
+
+
+
+
+\subsection{Define some environmental variables}
+Add the following lines to your .bash$\_$profile file (if it doesn't exist, create it): \\
+****************************************************************************\\
+
+$\#$Path to the pulsar software installation directory eg: 
+
+export ASTROSOFT=/Users/{user}/pulsar$\_$software \\
+
+$\#$ PSRCAT
+
+export PSRCAT$\_$RUNDIR=$\$$ASTROSOFT/psrcat$\_$tar
+
+export PSRCAT$\_$FILE=$\$$ASTROSOFT/psrcat$\_$tar/psrcat.db \\
+
+$\#$ Tempo
+
+export TEMPO=$\$$ASTROSOFT/tempo \\
+
+$\#$ Tempo2
+
+export TEMPO2=$\$$ASTROSOFT/tempo2/T2runtime \\
+
+$\#$ PGPLOT
+
+export PGPLOT$\_$DIR=/usr/local/Cellar/pgplot
+
+export PGPLOT$\_$DEV=/xwindow \\
+
+$\#$ PRESTO
+
+export PRESTO=$\$$ASTROSOFT/presto\\
+
+$\#$ DYLD$\_$LIBRARY$\_$PATH
+
+export DYLD$\_$LIBRARY $\_$ PATH~=~$\$$DYLD$\_$LIBRARY$\_$PATH:$\$$ASTROSOFT/lib:$\$$PRESTO/lib \\
+
+$\#$ PATH 
+
+$\#$ Some Presto executables match sigproc executables so keep separate -
+
+$\#$ all other executables are found in $\$$ASTROSOFT/bin
+
+export PATH=$\$$PATH:/usr/local/git/bin:$\$$ASTROSOFT/bin:$\$$PRESTO/bin
+****************************************************************************\\
+
+Then reload your .bash$\_$profile file and check changes are taken up:
+\begin{itemize}
+\item source $\sim$/.bash$\_$profile
+\item echo $\$$ASTROSOFT
+\end{itemize}
+\section{Sigproc/Sigpyproc Install on MacOs} 
+Main page of Sigproc:   
+  
+ \url{http://sigproc.sourceforge.net/} \\
+
+\subsection{ Dependencies }
+\begin{enumerate}[a.]
+\item Tempo \\
+	Main Page: \url{http://tempo.sourceforge.net/} \\
+	Install:
+	\begin{enumerate}[1):]
+	\item git clone \url{http://git.code.sf.net/p/tempo/tempo} 
+	\item cd tempo
+	\item ./prepare
+	\item ./configure F77=gfortran -~-prefix=$\$$ASTROSOFT
+	\item make
+	\item make install
+	\end{enumerate}		 
+
+\item (Optiion 1 Mainly Suggested)Tempo2\\
+	
+	Main Page: \url{http://www.atnf.csiro.au/research/pulsar/tempo2/index.php?n=Main.Download} \\
+	Install:
+	\begin{enumerate}[1):]
+	\item git clone \url{https://bitbucket.org/psrsoft/tempo2.git}
+	\item cd tempo2
+	\item ./bootstrap
+	\item ./configure F77=gfortran -~-prefix=$\$$ASTROSOFT
+	\item make $\&\&$ make install
+	\item make plugins $\&\&$ make plugins-install
+	\end{enumerate}	
+
+   (Option 2)Tempo2\\
+	
+	Main Page: \url{http://tempo.sourceforge.net/} \\
+	Install:
+	\begin{enumerate}[1):]
+	\item wget \url{https://bitbucket.org/psrsoft/tempo2/downloads/tempo2-2017.03.1.tar.gz}
+	\item tar -xf tempo2-2017.03.1.tar.gz
+	\item cd tempo2
+	\item ./bootstrap
+	\item ./configure F77=gfortran -~-prefix=$\$$ASTROSOFT
+	\item make $\&\&$ make install
+	\item make plugins $\&\&$ make plugins-install
+	\end{enumerate}	
+\item FFTW3\\
+	Main Page: \url{http://fftw.org/}
+	Install:
+	\begin{enumerate}[1):]
+	\item wget \url{http://fftw.org/fftw-3.3.7.tar.gz}
+	\item tar -xf fftw-3.3.7.tar.gz
+	\item cd fftw-3.3.7
+	\item ./configure  -~-prefix=$\$$ASTROSOFT
+	\item make
+	\item make install
+	\end{enumerate}		
+\item Cfitsio \\
+	Already installed from $brew$. Note to specify the lib PATH of Cfitsio:\\
+	/usr/local/Cellar/cfitsio/3.420/lib
+\item Pgplot
+	Already installed from $brew$. Note to specify the lib PATH of PGPlot:\\
+	/usr/local/Cellar/pgplot
+\end{enumerate}
+
+\subsection{Trick to install Sigproc on Mac}
+\subsubsection{Source from Michael Keith's release}
+\begin{enumerate}[a):]
+\item git clone \url{https://github.com/SixByNine/sigproc.git}
+\item ./bootstrap
+\item (For MacOs)./configure --prefix=/Users/nch/pulsar$\_$software --with-cfitsio-dir=/usr/local/Cellar/cfitsio/3.420 --with-fftw-dir=$\$$ASTROSOFT F77=gfortran FC=gfortran \\
+
+ (For Centos)./configure --prefix=/Users/nch/pulsar$\_$software --with-cfitsio-dir=/usr/local/Cellar/cfitsio/3.420 --with-fftw-dir=$\$$ASTROSOFT 
+\item make
+\item make install
+\end{enumerate}
+\subsubsection{Other Choice}
+\begin{enumerate}[1):]
+\item  Download source packet from main page:\\
+ \url{http://prdownloads.sourceforge.net/sigproc/sigproc-4.3.tar.gz?download}
+ \item tar -xf sigproc-4.3.tar.gz
+ \item cd sigproc-4.3
+ \item ./configure \\
+ Enter eg. at prompt to set the default path of the executables.
+ \item Edit makefile.darwin with the following:\\
+ 
+   ***********************
+ 	\begin{enumerate}[a)]
+ 	\item 	Ensure the PGPLOT libraries in the LPGPLOT line are in the following order, and add -lpng to enable png output from PGPLOT: \\
+ 	-lcpgplot -lpgplot -lpng
+ 	\item  Add the following line defining the fortran compiler: \\
+ 	FC = gfortran -ffixed-line-length-none
+ 	\item Uncomment LFITS and LFFTW and edit paths to: \\
+ 	
+ 	LFITS = -L/path/to/lib/ -lcfitsio  \\ 
+ 	LFFTW = -L/path/to/lib/ -lfftw3 -lfftw3f \\
+ 	
+ 	Here Our path are:\\
+ 	
+ 	LFITS = -L/usr/local/Cellar/cfitsio/3.420/lib -lcfitsio\\ 
+    LFFTW = -L$\$$(ASTROSOFT)/lib -lfftw3 -lfftw3f
+
+ 	\end{enumerate}
+ 	***********************\\    
+\item Remove the backslash and quote from dosearch.f (line 265):\\
+	Change from:\\
+	write(llog,*) 'DB\'~s slow-but-simple harmonic summing routine' \\
+	to:\\
+	write(llog,*) 'DBs slow-but-simple harmonic summing routine'
+\item Edit makefile:\\
+***********************\\
+	include makefile.$\$$(OSTYPE) \\
+
+	to:\\
+
+	include makefile.darwin\\
+	
+	LIB = libsigproc$\_\$$(OSTYPE).a \\
+
+	to:\\
+
+	LIB = libsigproc$\_$darwin.a \\
+***********************\\	
+\item Save the file and compile it:
+   \begin{enumerate}
+ 	 	\item[$\$$] make
+ 	 	\item[$\$$] make quickplot
+   \end{enumerate}
+
+\end{enumerate}
+
+\subsection{Use Sigproc and Sigpyproc}
+Following the steps above , sigproc should be work.  For Sigpyproc which are a python version for sigproc, I have written a memo in the early time. you can find it from :\\
+\url{https://github.com/peterniuzai/Work_memo/raw/master/SIGPYPROC_MEMO.pdf}\\
+It has description for both Mac and Linux server.
+The manual of Sigproc could found from:\\
+\url{http://sigproc.sourceforge.net/sigproc.pdf}\\
+The use of Sigpyproc could found from:\\
+\url{http://www3.mpifr-bonn.mpg.de/staff/ebarr/sigpyproc/Introduction.html}
+
+\section{Presto install on Mac}
+Main Page:\\
+\url{http://www.cv.nrao.edu/~sransom/presto/}\\
+Get the latest version of Presto from the main page:
+\begin{enumerate}[1)]
+\item git clone git://github.com/scottransom/presto.git
+\item cd presto
+\item git pull 
+\end{enumerate}
+\subsection{Dependencies}
+Presto has the dependencies same as Sigproc. 
+\subsection{Trick to install Presto on Mac}
+\begin{enumerate}[1):]
+\item cd presto/src
+\item Edit Makefile as follows: \\
+	\begin{enumerate}[a)]
+	\item Define paths to fftw and cfitsio includes and libs:\\
+		\begin{itemize}
+		\item[-] FFTINC = -I$\$$(ASTROSOFT)/include
+		\item[-] FFTLINK = -L$\$$(ASTROSOFT)/lib -lfftw3f
+		\item[-] CFITSIOINC = -I/usr/local/Cellar/cfitsio/3.420/include
+		\item[-] CFITSIOLINK = -L/usr/local/Cellar/cfitsio/3.420/lib/ -lcfitsio
+		\end{itemize}
+	\item Add -lm flag to CFLAGS: \\
+		CFLAGS = -I$\$$(PRESTO)/include~$\$$(GLIBINC)~$\$$(CFITSIOINC) $\$$(PGPLOTINC) $\$$(FFTINC) \
+        -DUSEFFTW -DUSEMMAP -D$\_$LARGEFILE$\_$SOURCE -D$\_$FILE$\_$OFFSET$\_$BITS=64 \
+        -g -Wall -W -fPIC -O3 -ffast-math -Wall -W -fPIC -lm
+	\end{enumerate}
+\item Continue the build:
+  \begin{itemize}
+    \item[$\$$] make makewisdom
+    \item[$\$$] make prep
+    \item[$\$$] make 
+   \end{itemize}
+\end{enumerate}
+\subsection{Use Presto}
+There's a nice PPT to show us how to use Presto:
+\url{http://www.cv.nrao.edu/~sransom/PRESTO_search_tutorial.pdf}
+
+\section*{Install Pulsar software on Linux server Ubuntu/Centos}
+\section{Install Presto on Ubuntu}
+Refer from:\\
+ \url{https://docs.google.com/document/d/1v8Dm4f-SOeDQX5Yli6syek1pxtqgpw81b1cxqoqv2aU/edit#} \\
+ 
+\subsection{Get dependencies ready}
+sudo apt-get install git libfftw3-bin libfftw3-dbg libfftw3-dev libfftw3-doc libfftw3-double3 libfftw3-long3 libfftw3-quad3 libfftw3-single3 pgplot5 csh automake gfortran libglib2.0-dev libccfits-dev libcfitsio3 libcfitsio3-dev libx11-dev libpng12-dev nvidia-cuda-dev libcuda1-331 -y
+\subsection{Install steps}
+\begin{enumerate}[Step 1)]
+\item git clone git://github.com/scottransom/presto.git
+\item git clone git://git.code.sf.net/p/tempo/tempo
+\item cd tempo
+\item ./prepare
+\item ./configure --prefix=/usr/local/
+\item make $\&\&$ sudo make install
+\item cp tempo.cfg src/
+\item cp tempo.hlp src/
+\item sudo vi /etc/environment
+		\begin{enumerate}[*]
+		\item TEMPO=”/home/nch/work/tempo/src”
+		\item PRESTO=”/home/nch/work/presto”
+		\it	em PGPLOT$\_$DIR=”/usr/lib/pgplot5”
+		\item FFTW$\_$PATH=”/usr/”
+		\item LD$\_$LIBRARY$\_$PATH=”/usr/local/cuda/lib64:/usr/local/cuda/lib:/home/nch/work/presto/lib”
+		\item PYTHONPATH=”/home/nch/work/presto/python:/home/nch/work/presto/lib/python”
+		\end{enumerate}
+\item sudo reboot
+\item cd ~/Downloads/presto/src
+\item make makewisdom
+\item make prep
+\item make 
+\end{enumerate}
+\subsection{Test Presto}
+\begin{itemize}
+\item[$\$$] wget  \url{http://www.cv.nrao.edu/~sransom/GBT_Lband_PSR.fil} \\
+\item[$\$$] readfile GBT$\_$Lband$\_$PSR.fil \\
+\item[$\$$] rfifind -time 2.0 -o Lband GBT$\_$Lband$\_$PSR.fil \\
+\item[$\$$] prepfold -n 64 -nsub 96 -p 0.004621638 -dm 62.0 GBT$\_$Lband$\_$PSR.fil
+\end{itemize}
+
+\section{Install Presto on Centos}
+This is similar as Ubuntu. Different thing is some dependency software yum doesn't have.\\
+
+1)you need install Cfitsio from \url{https://heasarc.gsfc.nasa.gov/fitsio/} \\
+Here I use the latest version: cfitsio$\_$latest.tar.gz \\
+
+2) FFTW, you could find this from MacOS instruction. \\
+( ./configure --prefix=/usr/local/ --enable-float --enable-threads --enable-shared CFLAGS=-fPIC FFLAGS=-fPIC) \\
+
+3) Install libpng-code: \\
+	url{http://libpng.org/pub/png/libpng.html}\\
+    ./configure [--prefix=/path] \\
+
+    make check \\
+
+    make install
+
+4) PGplot  \\
+
+	This is a tricky thing. refer to:\\
+	 \url{https://www.cnblogs.com/shaoguangleo/archive/2012/04/09/2806095.html} \\
+	 \begin{enumerate}[1)]
+	 \item sudo yum install libX11-devel
+	 \item sudo yum install gcc-gfortran 
+	 \item cd /usr/local/src
+	 \item mv ~/Downloads/pgplot5.2.tar.gz .
+	 \item tar zxvf pgplot5.2.tar.gz
+	 \item mkdir /usr/local/pgplot
+	 \item cd /usr/local/pgplot
+	 \item cp /usr/local/src/pgplot/drivers.list . 
+	 \item Edit drives.list , Remove the "!"  before :\\
+	 /PS, /VPS, /CPS, /VCPS and /XServe /XWINDOW 
+	 \item Do the following command in dir: /usr/local/pgplot\\
+	 /usr/local/src/pgplot/makemake /usr/local/src/pgplot linux g77$\_$gcc$\_$aout
+	 \item Edit makefile :
+	 \item Instead of FCOMPL=g77 by FCOMPL=gfortran
+	 \item make $\&\&$ make cpg 
+	 \item Set the environment: \\
+	 	\begin{itemize}
+	 	\item[$\$$] export PGPLOT$\_$DIR=/usr/local/pgplot
+	 	\item[$\$$] export PGPLOT$\_$DEV=/Xserve
+	 	\end{itemize}
+	 \item Test:\\	
+	 	\begin{itemize}
+	 	\item[$\$$] /usr/local/pgplot/pgdemo1
+	 	\item[$\$$] /usr/local/pgplot/pgdemo2
+	 	\item[$\$$] ...
+	 	\end{itemize}
+	 \end{enumerate}
+After install the dependencies above, then set the environment. Just follow the INSTALL file in PRESTO source. Remember use '--prefix=/usr/local/' when configure.
+
+\section{Common Problems}
+\begin{enumerate}[(1)]
+\item "Can't find presto.so" : \\
+Check if LD$\_$LiBRARY$\_$PATH variable defined.if not ,defined it in .bashrc \\
+export LD$\_$LIBRARY$\_$PATH="$\$$LD$\_$LIBRARY$\_$PATH:$\$$HOME/work/sigpyproc/lib/c"
+\item  "undefined reference to curl$|\_$global$\_$init, curl$\_$easy$\_$init and other function(C)" \\
+\url{https://stackoverflow.com/questions/16476196/undefined-reference-to-curl-global-init-curl-easy-init-and-other-functionc} \\
+gcc -lcurl test.c 
+\item Open un-recognized observatory: \\
+Add observatory info in /tempo/obsys.dat  \\
+In $\$$presto/src/ , open misc$\_$utils.c file.  \\
+modify function: telescope$\_$to$\_$tempocode() , add the observatory info.\\
+Recompile presto again.
+
+\end{enumerate}
+
+\end{document}
